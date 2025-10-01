@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, Suspense } from 'react'
 import { useSearchParams, useRouter } from 'next/navigation'
 import { Shield, CheckCircle, Package, Mail, ArrowRight } from 'lucide-react'
 
@@ -20,7 +20,7 @@ interface OrderDetails {
   createdAt: string
 }
 
-export default function OrderSuccess() {
+function OrderSuccessContent() {
   const [order, setOrder] = useState<OrderDetails | null>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
@@ -242,5 +242,17 @@ export default function OrderSuccess() {
         </div>
       </div>
     </div>
+  )
+}
+
+export default function OrderSuccess() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-yellow-600"></div>
+      </div>
+    }>
+      <OrderSuccessContent />
+    </Suspense>
   )
 }
