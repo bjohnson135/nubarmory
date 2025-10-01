@@ -9,6 +9,7 @@
 
 import '@/../jest.setup.node.js'
 import { PrismaClient } from '@prisma/client'
+import { NextRequest } from 'next/server'
 
 // Mock PrismaClient for order creation and retrieval
 jest.mock('@prisma/client')
@@ -144,7 +145,7 @@ describe('Cart Customization Integration Flow', () => {
       }
     }
 
-    mockPrismaCreate.mockResolvedValue({ id: orderId, ...mockCreatedOrder })
+    mockPrismaCreate.mockResolvedValue({ ...mockCreatedOrder })
 
     const createPaymentRequest = {
       json: jest.fn().mockResolvedValue({
@@ -152,7 +153,7 @@ describe('Cart Customization Integration Flow', () => {
         customerInfo: mockCustomerInfo,
         shippingAddress: mockShippingAddress
       })
-    } as unknown as Request
+    } as unknown as NextRequest
 
     const paymentResponse = await createPaymentIntent(createPaymentRequest)
     const paymentData = await paymentResponse.json()
@@ -199,12 +200,11 @@ describe('Cart Customization Integration Flow', () => {
 
     // Step 2: Update order with shipping information
     const mockUpdatedOrder = {
-      id: orderId,
+      ...mockCreatedOrder,
       customerName: mockCustomerInfo.name,
       customerEmail: mockCustomerInfo.email,
       customerPhone: mockCustomerInfo.phone,
-      shippingAddress: mockShippingAddress,
-      ...mockCreatedOrder
+      shippingAddress: mockShippingAddress
     }
 
     mockPrismaUpdate.mockResolvedValue(mockUpdatedOrder)
@@ -214,7 +214,7 @@ describe('Cart Customization Integration Flow', () => {
         customerInfo: mockCustomerInfo,
         shippingAddress: mockShippingAddress
       })
-    } as unknown as Request
+    } as unknown as NextRequest
 
     const updateResponse = await updateShipping(
       updateShippingRequest,
@@ -274,7 +274,7 @@ describe('Cart Customization Integration Flow', () => {
 
     mockPrismaFindUnique.mockResolvedValue(mockOrderWithItems)
 
-    const getOrderRequest = {} as Request
+    const getOrderRequest = {} as NextRequest
     const getOrderResponse = await getOrder(
       getOrderRequest,
       { params: Promise.resolve({ id: orderId }) }
@@ -333,7 +333,7 @@ describe('Cart Customization Integration Flow', () => {
         customerInfo: mockCustomerInfo,
         shippingAddress: mockShippingAddress
       })
-    } as unknown as Request
+    } as unknown as NextRequest
 
     await createPaymentIntent(createRequest)
 
@@ -406,7 +406,7 @@ describe('Cart Customization Integration Flow', () => {
         customerInfo: mockCustomerInfo,
         shippingAddress: mockShippingAddress
       })
-    } as unknown as Request
+    } as unknown as NextRequest
 
     await createPaymentIntent(createRequest)
 
@@ -431,7 +431,7 @@ describe('Cart Customization Integration Flow', () => {
         customerInfo: mockCustomerInfo,
         shippingAddress: mockShippingAddress
       })
-    } as unknown as Request
+    } as unknown as NextRequest
 
     await createPaymentIntent(createRequest)
 
@@ -460,7 +460,7 @@ describe('Cart Customization Integration Flow', () => {
         customerInfo: mockCustomerInfo,
         shippingAddress: mockShippingAddress
       })
-    } as unknown as Request
+    } as unknown as NextRequest
 
     await updateShipping(updateRequest, { params: Promise.resolve({ id: orderId }) })
 
