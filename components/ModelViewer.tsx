@@ -34,10 +34,10 @@ export default function ModelViewer({
   console.log('ModelViewer: Component rendering with props:', { modelUrl, selectedColors, width, height })
 
   const mountRef = useRef<HTMLDivElement>(null)
-  const sceneRef = useRef<THREE.Scene>()
-  const rendererRef = useRef<THREE.WebGLRenderer>()
-  const modelRef = useRef<THREE.Mesh>()
-  const frameRef = useRef<number>()
+  const sceneRef = useRef<THREE.Scene | null>(null)
+  const rendererRef = useRef<THREE.WebGLRenderer | null>(null)
+  const modelRef = useRef<THREE.Mesh | null>(null)
+  const frameRef = useRef<number | null>(null)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
@@ -389,11 +389,11 @@ export default function ModelViewer({
         // Single material
         updateMaterialColor(material, selectedColors[0])
       }
-    } else if (model instanceof THREE.Group) {
+    } else if (model && typeof model === 'object' && (model as any) instanceof THREE.Group) {
       // Group of meshes (3MF files)
       console.log('ModelViewer: Updating 3MF group colors, selected colors:', selectedColors)
       let meshIndex = 0
-      model.traverse((child) => {
+      (model as any).traverse((child: any) => {
         if (child instanceof THREE.Mesh && child.material) {
           const material = child.material
           if (Array.isArray(material)) {

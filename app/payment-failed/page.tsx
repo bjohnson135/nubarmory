@@ -89,7 +89,7 @@ export default function PaymentFailed() {
           <XCircle className="h-16 w-16 text-red-500 mx-auto mb-4" />
           <h1 className="text-3xl font-bold text-gray-900 mb-2">Payment Failed</h1>
           <p className="text-lg text-gray-600">
-            We were unable to process your payment. Don't worry - your order hasn't been charged.
+            We were unable to process your payment. Don&apos;t worry - your order hasn&apos;t been charged.
           </p>
         </div>
 

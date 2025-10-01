@@ -97,10 +97,10 @@ function CheckoutForm({
       } else {
         // For payment methods that require redirect (like Klarna), Stripe will handle the redirect automatically
         // For immediate payments (like cards), we should get a paymentIntent back
-        if (result.paymentIntent && result.paymentIntent.status === 'succeeded') {
+        if ('paymentIntent' in result && result.paymentIntent && (result.paymentIntent as any).status === 'succeeded') {
           // Payment successful - clear cart and redirect to success page
           clearCart()
-          router.push(`/order-success?order_id=${orderId}&payment_intent=${result.paymentIntent.id}`)
+          router.push(`/order-success?order_id=${orderId}&payment_intent=${(result.paymentIntent as any).id}`)
         } else {
           // Payment is processing or requires redirect - Stripe will handle this
           clearCart() // Clear cart as payment is in progress
@@ -304,10 +304,10 @@ export default function CheckoutPage() {
           items: items.map(item => ({
             productId: item.product.id,
             quantity: item.quantity,
-            weightOz: item.product.weightOz,
-            lengthIn: item.product.lengthIn,
-            widthIn: item.product.widthIn,
-            heightIn: item.product.heightIn
+            weightOz: (item.product as any).weightOz || 4,
+            lengthIn: (item.product as any).lengthIn || 8,
+            widthIn: (item.product as any).widthIn || 3,
+            heightIn: (item.product as any).heightIn || 3
           })),
           shippingAddress
         })
@@ -629,7 +629,7 @@ export default function CheckoutPage() {
                 )}
                 <div className="space-y-2 mb-4">
                   {effectiveItems.map((item) => (
-                    <div key={item.id || item.product.id} className="text-sm">
+                    <div key={(item as any).id || item.product.id} className="text-sm">
                       <div className="flex justify-between">
                         <span>{item.product.name} {item.quantity > 1 ? `x${item.quantity}` : ''}</span>
                         <span>${(item.product.price * item.quantity).toFixed(2)}</span>
@@ -639,8 +639,8 @@ export default function CheckoutPage() {
                           {item.customization.engraving && (
                             <div>Engraving: {item.customization.engraving}</div>
                           )}
-                          {item.customization.colors && item.customization.colors.length > 0 && (
-                            <div>Colors: {Array.isArray(item.customization.colors) ? item.customization.colors.join(', ') : item.customization.colors}</div>
+                          {item.customization && 'colors' in item.customization && (item.customization as any).colors && Array.isArray((item.customization as any).colors) && (item.customization as any).colors.length > 0 && (
+                            <div>Colors: {(item.customization as any).colors.join(', ')}</div>
                           )}
                           {item.customization.finish && (
                             <div>Finish: {item.customization.finish}</div>

@@ -18,12 +18,15 @@ export default function ProductDetail({ product }: ProductDetailProps) {
   const [quantity, setQuantity] = useState(1)
 
   // Stabilize materialId to prevent unnecessary re-renders
-  const materialId = useMemo(() => (product as any).materialId, [(product as any).materialId])
+  const productMaterialId = (product as any).materialId
+  const materialId = useMemo(() => productMaterialId, [productMaterialId])
 
   // Initialize with default colors from product if available
+  const productAvailableColors = (product as any).availableColors
+  const productNumberOfColors = (product as any).numberOfColors
   const defaultColors = useMemo(() =>
-    (product as any).availableColors?.slice(0, (product as any).numberOfColors || 1) || [],
-    [(product as any).availableColors, (product as any).numberOfColors]
+    productAvailableColors?.slice(0, productNumberOfColors || 1) || [],
+    [productAvailableColors, productNumberOfColors]
   )
 
   const [selectedColors, setSelectedColors] = useState<string[]>(defaultColors)
@@ -34,6 +37,13 @@ export default function ProductDetail({ product }: ProductDetailProps) {
     colors: defaultColors
   })
   const { addItem } = useCart()
+
+  // Handle color selection from ColorSelector
+  const handleColorSelect = useCallback((colors: string[]) => {
+    console.log('ProductDetail: ColorSelector onColorSelect called with:', colors)
+    setSelectedColors(colors)
+    setCustomization(prev => ({ ...prev, colors }))
+  }, [])
 
   // Convert color names to hex codes for 3D viewer
   const convertColorNamesToHex = useCallback(async (colorNames: string[]) => {
@@ -234,11 +244,7 @@ export default function ProductDetail({ product }: ProductDetailProps) {
                   <ColorSelector
                     materialId={materialId}
                     numberOfColors={(product as any).numberOfColors || 1}
-                    onColorSelect={useCallback((colors: string[]) => {
-                      console.log('ProductDetail: ColorSelector onColorSelect called with:', colors)
-                      setSelectedColors(colors)
-                      setCustomization(prev => ({ ...prev, colors }))
-                    }, [])}
+                    onColorSelect={handleColorSelect}
                   />
                 </div>
               )}

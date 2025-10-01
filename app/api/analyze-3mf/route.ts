@@ -80,11 +80,12 @@ export async function POST(request: NextRequest) {
       analysis.hasMaterials = baseMaterials.length > 0
 
       Array.from(baseMaterials).forEach((material, index) => {
-        const name = material.getAttribute('name') || `Material ${index + 1}`
-        const displayColor = material.getAttribute('displaycolor') || '#808080'
+        const materialElement = material as Element
+        const name = materialElement.getAttribute('name') || `Material ${index + 1}`
+        const displayColor = materialElement.getAttribute('displaycolor') || '#808080'
 
         analysis.materials.push({
-          id: material.getAttribute('id') || index.toString(),
+          id: materialElement.getAttribute('id') || index.toString(),
           name,
           displayColor,
           index
@@ -97,9 +98,11 @@ export async function POST(request: NextRequest) {
       analysis.hasColors = colorGroups.length > 0
 
       Array.from(colorGroups).forEach((colorGroup, index) => {
-        const colors = colorGroup.getElementsByTagName('color')
+        const colorGroupElement = colorGroup as Element
+        const colors = colorGroupElement.getElementsByTagName('color')
         Array.from(colors).forEach((color, colorIndex) => {
-          const colorValue = color.getAttribute('color') || '#808080'
+          const colorElement = color as Element
+          const colorValue = colorElement.getAttribute('color') || '#808080'
           analysis.materials.push({
             id: `colorgroup_${index}_${colorIndex}`,
             name: `Color ${colorIndex + 1} from Group ${index + 1}`,
@@ -116,12 +119,13 @@ export async function POST(request: NextRequest) {
       analysis.xmlStructure.hasObjects = objects.length > 0
 
       Array.from(objects).forEach((object, index) => {
-        const objectId = object.getAttribute('id') || index.toString()
-        const objectType = object.getAttribute('type') || 'model'
-        const name = object.getAttribute('name') || `Object ${index + 1}`
+        const objectElement = object as Element
+        const objectId = objectElement.getAttribute('id') || index.toString()
+        const objectType = objectElement.getAttribute('type') || 'model'
+        const name = objectElement.getAttribute('name') || `Object ${index + 1}`
 
         // Count triangles in this object
-        const triangles = object.getElementsByTagName('triangle')
+        const triangles = objectElement.getElementsByTagName('triangle')
 
         // Check for material assignments and other attributes including Bambu Studio paint colors
         const materialAssignments = new Set()

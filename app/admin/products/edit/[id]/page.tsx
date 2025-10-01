@@ -870,7 +870,7 @@ export default function EditProduct() {
                     />
                   </div>
                 </div>
-                <p className="text-xs text-gray-500 mt-2">Used for calculating accurate shipping costs. Leave blank to use defaults (4oz, 8"×3"×3")</p>
+                <p className="text-xs text-gray-500 mt-2">Used for calculating accurate shipping costs. Leave blank to use defaults (4oz, 8&rdquo;×3&rdquo;×3&rdquo;)</p>
               </div>
 
               {/* Material and Color Customization */}

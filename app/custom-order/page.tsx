@@ -203,8 +203,8 @@ export default function CustomOrderPage() {
                 <h3 className="font-semibold mb-2">What Happens Next?</h3>
                 <ul className="text-sm text-gray-600 space-y-1">
                   <li>• Our craftsman will review your design within 24-48 hours</li>
-                  <li>• You'll receive a detailed quote and timeline</li>
-                  <li>• Once approved, we'll create a 3D mockup for your review</li>
+                  <li>• You&apos;ll receive a detailed quote and timeline</li>
+                  <li>• Once approved, we&apos;ll create a 3D mockup for your review</li>
                   <li>• After final approval, production begins</li>
                   <li>• Your custom piece will be shipped with tracking</li>
                 </ul>

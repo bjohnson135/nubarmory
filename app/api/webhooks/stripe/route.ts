@@ -67,7 +67,7 @@ export async function POST(request: NextRequest) {
               productName: item.product.name,
               quantity: item.quantity,
               price: item.price,
-              customization: item.customization || undefined
+              customization: typeof item.customization === 'string' ? item.customization : JSON.stringify(item.customization) || undefined
             }))
           }
 

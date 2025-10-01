@@ -67,12 +67,12 @@ export default function CartPage() {
                           Engraving: {item.customization.engraving}
                         </p>
                       )}
-                      {item.customization?.colors && item.customization.colors.length > 0 && (
+                      {item.customization && 'colors' in item.customization && item.customization.colors && Array.isArray(item.customization.colors) && item.customization.colors.length > 0 ? (
                         <p className="text-sm text-gray-600 mb-2 flex items-center">
                           <Palette className="h-3 w-3 mr-1" />
                           Colors: {formatColorSelection(item.customization.colors)}
                         </p>
-                      )}
+                      ) : null}
                       <p className="text-nub-gold font-semibold">
                         ${item.product.price.toFixed(2)}
                       </p>

@@ -10,7 +10,7 @@ export default function CheckoutSuccessPage() {
             <CheckCircle className="h-20 w-20 text-green-500 mx-auto mb-6" />
             <h1 className="text-3xl font-bold mb-4">Order Confirmed!</h1>
             <p className="text-gray-600 mb-8">
-              Thank you for your order. We've received your payment and will begin crafting your sword hilt nub holder immediately.
+              Thank you for your order. We&apos;ve received your payment and will begin crafting your sword hilt nub holder immediately.
             </p>
 
             <div className="bg-gray-50 rounded-lg p-6 mb-8 text-left">
@@ -19,7 +19,7 @@ export default function CheckoutSuccessPage() {
                 What Happens Next?
               </h2>
               <ul className="space-y-2 text-gray-600">
-                <li>• You'll receive an email confirmation shortly</li>
+                <li>• You&apos;ll receive an email confirmation shortly</li>
                 <li>• Our craftsman will begin 3D printing your order</li>
                 <li>• Quality inspection and finishing touches</li>
                 <li>• Your order will ship within 3-5 business days</li>

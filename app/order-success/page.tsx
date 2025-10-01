@@ -120,7 +120,7 @@ export default function OrderSuccess() {
           <CheckCircle className="h-16 w-16 text-green-500 mx-auto mb-4" />
           <h1 className="text-3xl font-bold text-gray-900 mb-2">Payment Successful!</h1>
           <p className="text-lg text-gray-600">
-            Thank you for your order. We've received your payment and will begin processing your items.
+            Thank you for your order. We&apos;ve received your payment and will begin processing your items.
           </p>
         </div>
 
@@ -202,9 +202,9 @@ export default function OrderSuccess() {
             <div>
               <h3 className="font-semibold text-yellow-800 mb-2">What happens next?</h3>
               <ul className="text-yellow-700 space-y-1">
-                <li>• You'll receive an order confirmation email shortly</li>
-                <li>• We'll begin crafting your custom sword hilt(s)</li>
-                <li>• You'll get tracking information once your order ships</li>
+                <li>• You&apos;ll receive an order confirmation email shortly</li>
+                <li>• We&apos;ll begin crafting your custom sword hilt(s)</li>
+                <li>• You&apos;ll get tracking information once your order ships</li>
                 <li>• Typical production time is 2-3 business days</li>
               </ul>
             </div>

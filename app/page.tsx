@@ -163,7 +163,7 @@ export default async function HomePage() {
                     <Star key={i} className="h-5 w-5 text-yellow-500 fill-current" />
                   ))}
                 </div>
-                <p className="text-gray-600 mb-4 italic">"{review.text}"</p>
+                <p className="text-gray-600 mb-4 italic">&ldquo;{review.text}&rdquo;</p>
                 <div className="flex items-center">
                   <div className="w-10 h-10 bg-yellow-100 rounded-full flex items-center justify-center text-yellow-600 font-bold mr-3">
                     {review.name.charAt(0)}
@@ -187,7 +187,7 @@ export default async function HomePage() {
               Ready to Forge Your Legend?
             </h2>
             <p className="text-xl mb-8 text-gray-800">
-              Create a custom sword hilt nub holder that's uniquely yours
+              Create a custom sword hilt nub holder that&apos;s uniquely yours
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <Link
