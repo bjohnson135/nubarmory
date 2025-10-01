@@ -1,0 +1,140 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = "file:./dev.db"
+}
+
+model Product {
+  id           String   @id @default(cuid())
+  name         String
+  description  String
+  price        Float
+  images       Json
+  category     String
+  materialId   String?
+  material     Material? @relation(fields: [materialId], references: [id])
+  finish       String
+  inStock      Boolean  @default(true)
+  stockQuantity Int     @default(0)
+  lowStockThreshold Int @default(5)
+  manufacturingTime String? // e.g., "2-3 weeks", "5-7 business days"
+  // Shipping dimensions and weight
+  weightOz     Float?   // Weight in ounces
+  lengthIn     Float?   // Length in inches
+  widthIn      Float?   // Width in inches
+  heightIn     Float?   // Height in inches
+  customizable Boolean  @default(false)
+  // Color customization
+  numberOfColors Int     @default(1) // How many colors can be selected (1, 2, 3, etc.)
+  availableColors Json   @default("[]") // Array of available colors for this product
+  // 3D Model
+  modelFile    String?  // Path to STL/3D model file
+  modelOrientation Json? // Orientation settings for 3D model (x, y, z rotation values)
+  colorZones   Json     @default("[]") // Array of color zones for multi-color printing
+  features     Json
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  orderItems   OrderItem[]
+}
+
+model Order {
+  id             String      @id @default(cuid())
+  customerName   String
+  customerEmail  String
+  customerPhone  String
+  shippingAddress Json
+  items          OrderItem[]
+  subtotal       Float
+  tax            Float
+  shipping       Float
+  total          Float
+  status         String      @default("pending")
+  paymentMethod  String
+  paymentIntentId String?
+  createdAt      DateTime    @default(now())
+  updatedAt      DateTime    @updatedAt
+}
+
+model OrderItem {
+  id             String   @id @default(cuid())
+  orderId        String
+  order          Order    @relation(fields: [orderId], references: [id])
+  productId      String
+  product        Product  @relation(fields: [productId], references: [id])
+  quantity       Int
+  price          Float
+  customization  Json?
+  createdAt      DateTime @default(now())
+}
+
+model CustomOrder {
+  id               String   @id @default(cuid())
+  customerName     String
+  customerEmail    String
+  customerPhone    String
+  description      String
+  referenceImages  Json?
+  budget          String
+  timeline        String
+  status          String   @default("pending")
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+}
+
+model Admin {
+  id           String   @id @default(cuid())
+  email        String   @unique
+  passwordHash String
+  name         String
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+}
+
+model Material {
+  id           String   @id @default(cuid())
+  name         String   @unique
+  displayName  String
+  description  String?
+  isActive     Boolean  @default(true)
+  sortOrder    Int      @default(0)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  colors       MaterialColor[]
+  products     Product[]
+}
+
+model Color {
+  id           String   @id @default(cuid())
+  name         String   @unique
+  displayName  String
+  hexCode      String
+  description  String?
+  isSpecial    Boolean  @default(false) // For special colors like glow-in-dark
+  isActive     Boolean  @default(true)
+  sortOrder    Int      @default(0)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  materials    MaterialColor[]
+}
+
+model MaterialColor {
+  id           String   @id @default(cuid())
+  materialId   String
+  colorId      String
+  isDefault    Boolean  @default(false) // Whether this color is selected by default for this material
+  isAvailable  Boolean  @default(true)
+  priceModifier Float   @default(0) // Additional cost for special colors
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  material     Material @relation(fields: [materialId], references: [id], onDelete: Cascade)
+  color        Color    @relation(fields: [colorId], references: [id], onDelete: Cascade)
+
+  @@unique([materialId, colorId])
+}
