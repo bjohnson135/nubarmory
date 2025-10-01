@@ -7,10 +7,24 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
+    "lint:fix": "next lint --fix",
+    "type-check": "tsc --noEmit",
     "test": "jest",
     "test:watch": "jest --watch",
     "test:coverage": "jest --coverage",
-    "db:seed": "npx tsx prisma/seed.ts"
+    "test:ci": "jest --coverage --watchAll=false",
+    "db:generate": "npx prisma generate",
+    "db:push": "npx prisma db push",
+    "db:seed": "npx tsx prisma/seed.ts",
+    "db:reset": "npx prisma migrate reset --force",
+    "db:studio": "npx prisma studio",
+    "audit:security": "npm audit --audit-level=moderate",
+    "audit:licenses": "npx license-checker --json --excludePrivatePackages",
+    "ci:install": "npm ci",
+    "ci:build": "npm run db:generate && npm run build",
+    "ci:test": "npm run lint && npm run type-check && npm run test:ci",
+    "deploy:vercel": "vercel --prod",
+    "postinstall": "npx prisma generate"
   },
   "prisma": {
     "seed": "npx tsx prisma/seed.ts"

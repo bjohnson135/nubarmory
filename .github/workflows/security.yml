@@ -1,0 +1,159 @@
+name: Security & Dependencies
+
+on:
+  schedule:
+    # Run daily at 2 AM UTC
+    - cron: '0 2 * * *'
+  push:
+    paths:
+      - 'package.json'
+      - 'package-lock.json'
+  workflow_dispatch:
+
+jobs:
+  security-scan:
+    name: Security Vulnerability Scan
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '20.x'
+        cache: 'npm'
+
+    - name: Install dependencies
+      run: npm ci
+
+    - name: Run npm audit
+      run: npm audit --audit-level=high
+      continue-on-error: true
+
+    - name: Run Snyk security scan
+      uses: snyk/actions/node@master
+      env:
+        SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
+      with:
+        args: --severity-threshold=high
+      continue-on-error: true
+
+    - name: Run CodeQL analysis
+      uses: github/codeql-action/init@v3
+      with:
+        languages: javascript
+
+    - name: Perform CodeQL analysis
+      uses: github/codeql-action/analyze@v3
+
+  dependency-update:
+    name: Check for Dependency Updates
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      with:
+        token: ${{ secrets.GITHUB_TOKEN }}
+
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '20.x'
+        cache: 'npm'
+
+    - name: Check for outdated packages
+      run: |
+        npm outdated --json > outdated.json || true
+        if [ -s outdated.json ]; then
+          echo "📦 Outdated packages found:"
+          cat outdated.json
+          echo "outdated_packages=true" >> $GITHUB_ENV
+        else
+          echo "✅ All packages are up to date"
+          echo "outdated_packages=false" >> $GITHUB_ENV
+        fi
+
+    - name: Create issue for outdated packages
+      if: env.outdated_packages == 'true'
+      uses: actions/github-script@v7
+      with:
+        script: |
+          const fs = require('fs');
+          const outdated = JSON.parse(fs.readFileSync('outdated.json', 'utf8'));
+
+          let body = '## 📦 Outdated Dependencies Report\\n\\n';
+          body += 'The following packages have updates available:\\n\\n';
+          body += '| Package | Current | Wanted | Latest |\\n';
+          body += '|---------|---------|--------|--------|\\n';
+
+          for (const [pkg, info] of Object.entries(outdated)) {
+            body += `| ${pkg} | ${info.current} | ${info.wanted} | ${info.latest} |\\n`;
+          }
+
+          body += '\\n> This issue was automatically created by the dependency update workflow.';
+
+          // Check if issue already exists
+          const issues = await github.rest.issues.listForRepo({
+            owner: context.repo.owner,
+            repo: context.repo.repo,
+            state: 'open',
+            labels: 'dependencies'
+          });
+
+          const existingIssue = issues.data.find(issue =>
+            issue.title.includes('Outdated Dependencies Report')
+          );
+
+          if (existingIssue) {
+            // Update existing issue
+            await github.rest.issues.update({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: existingIssue.number,
+              body: body
+            });
+          } else {
+            // Create new issue
+            await github.rest.issues.create({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              title: '📦 Outdated Dependencies Report',
+              body: body,
+              labels: ['dependencies', 'maintenance']
+            });
+          }
+
+  license-check:
+    name: License Compliance Check
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '20.x'
+        cache: 'npm'
+
+    - name: Install dependencies
+      run: npm ci
+
+    - name: Install license checker
+      run: npm install -g license-checker
+
+    - name: Check licenses
+      run: |
+        license-checker --json --excludePrivatePackages > licenses.json
+        echo "📜 License report generated"
+
+    - name: Upload license report
+      uses: actions/upload-artifact@v4
+      with:
+        name: license-report
+        path: licenses.json
+        retention-days: 30
