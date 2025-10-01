@@ -8,24 +8,28 @@
  * 4. Database operations maintain data integrity
  */
 
-import { NextRequest } from 'next/server'
-import { PUT } from '@/app/api/admin/products/[id]/route'
-
 // Mock Prisma
-const mockPrismaUpdate = jest.fn()
-const mockVerifyToken = jest.fn()
-
 jest.mock('@prisma/client', () => ({
   PrismaClient: jest.fn(() => ({
     product: {
-      update: mockPrismaUpdate
+      update: jest.fn()
     }
   }))
 }))
 
+// Mock auth
 jest.mock('@/lib/auth', () => ({
-  verifyToken: mockVerifyToken
+  verifyToken: jest.fn()
 }))
+
+import { NextRequest } from 'next/server'
+import { PUT } from '@/app/api/admin/products/[id]/route'
+import { PrismaClient } from '@prisma/client'
+import { verifyToken } from '@/lib/auth'
+
+// Get the mocked instances
+const mockPrisma = new PrismaClient() as jest.Mocked<PrismaClient>
+const mockVerifyToken = verifyToken as jest.MockedFunction<typeof verifyToken>
 
 // Mock cookies
 const mockCookieGet = jest.fn()
@@ -75,7 +79,7 @@ describe('Product Update API Route - 3MF Color Data Persistence', () => {
         features: ['Custom engraving', 'Multiple colors']
       }
 
-      mockPrismaUpdate.mockResolvedValue({
+      mockPrisma.product.update.mockResolvedValue({
         id: 'test-product-id',
         ...testData,
         images: [testData.image],
@@ -87,7 +91,7 @@ describe('Product Update API Route - 3MF Color Data Persistence', () => {
       const responseData = await response.json()
 
       // Verify the update was called with correct data
-      expect(mockPrismaUpdate).toHaveBeenCalledWith({
+      expect(mockPrisma.product.update).toHaveBeenCalledWith({
         where: { id: 'test-product-id' },
         data: {
           name: 'Test Sword',
@@ -130,12 +134,12 @@ describe('Product Update API Route - 3MF Color Data Persistence', () => {
         material: 'material-id'
       }
 
-      mockPrismaUpdate.mockResolvedValue({ id: 'test-id', ...testData })
+      mockPrisma.product.update.mockResolvedValue({ id: 'test-id', ...testData })
 
       const request = createMockRequest(testData)
       await PUT(request, { params: mockParams })
 
-      expect(mockPrismaUpdate).toHaveBeenCalledWith(
+      expect(mockPrisma.product.update).toHaveBeenCalledWith(
         expect.objectContaining({
           data: expect.objectContaining({
             numberOfColors: 3 // Should be converted to integer
@@ -156,12 +160,12 @@ describe('Product Update API Route - 3MF Color Data Persistence', () => {
         material: 'material-id'
       }
 
-      mockPrismaUpdate.mockResolvedValue({ id: 'test-id', ...testData })
+      mockPrisma.product.update.mockResolvedValue({ id: 'test-id', ...testData })
 
       const request = createMockRequest(testData)
       await PUT(request, { params: mockParams })
 
-      expect(mockPrismaUpdate).toHaveBeenCalledWith(
+      expect(mockPrisma.product.update).toHaveBeenCalledWith(
         expect.objectContaining({
           data: expect.objectContaining({
             availableColors: testColors // Should preserve exact array
@@ -179,12 +183,12 @@ describe('Product Update API Route - 3MF Color Data Persistence', () => {
         // Missing: numberOfColors, availableColors, modelFile, etc.
       }
 
-      mockPrismaUpdate.mockResolvedValue({ id: 'test-id', ...minimalData })
+      mockPrisma.product.update.mockResolvedValue({ id: 'test-id', ...minimalData })
 
       const request = createMockRequest(minimalData)
       await PUT(request, { params: mockParams })
 
-      expect(mockPrismaUpdate).toHaveBeenCalledWith(
+      expect(mockPrisma.product.update).toHaveBeenCalledWith(
         expect.objectContaining({
           data: expect.objectContaining({
             numberOfColors: 1, // Should default to 1
@@ -214,12 +218,12 @@ describe('Product Update API Route - 3MF Color Data Persistence', () => {
         heightIn: '1.0' // String
       }
 
-      mockPrismaUpdate.mockResolvedValue({ id: 'test-id' })
+      mockPrisma.product.update.mockResolvedValue({ id: 'test-id' })
 
       const request = createMockRequest(testData)
       await PUT(request, { params: mockParams })
 
-      expect(mockPrismaUpdate).toHaveBeenCalledWith(
+      expect(mockPrisma.product.update).toHaveBeenCalledWith(
         expect.objectContaining({
           data: expect.objectContaining({
             price: 123.45, // Should be float
@@ -244,12 +248,12 @@ describe('Product Update API Route - 3MF Color Data Persistence', () => {
         numberOfColors: '0' // Should become 1 (minimum)
       }
 
-      mockPrismaUpdate.mockResolvedValue({ id: 'test-id' })
+      mockPrisma.product.update.mockResolvedValue({ id: 'test-id' })
 
       const request = createMockRequest(testData)
       await PUT(request, { params: mockParams })
 
-      expect(mockPrismaUpdate).toHaveBeenCalledWith(
+      expect(mockPrisma.product.update).toHaveBeenCalledWith(
         expect.objectContaining({
           data: expect.objectContaining({
             stockQuantity: 0,
@@ -269,7 +273,7 @@ describe('Product Update API Route - 3MF Color Data Persistence', () => {
       const response = await PUT(request, { params: mockParams })
 
       expect(response.status).toBe(401)
-      expect(mockPrismaUpdate).not.toHaveBeenCalled()
+      expect(mockPrisma.product.update).not.toHaveBeenCalled()
     })
 
     it('should return 400 for missing required fields', async () => {
@@ -282,11 +286,11 @@ describe('Product Update API Route - 3MF Color Data Persistence', () => {
       const response = await PUT(request, { params: mockParams })
 
       expect(response.status).toBe(400)
-      expect(mockPrismaUpdate).not.toHaveBeenCalled()
+      expect(mockPrisma.product.update).not.toHaveBeenCalled()
     })
 
     it('should return 500 for database errors', async () => {
-      mockPrismaUpdate.mockRejectedValue(new Error('Database error'))
+      mockPrisma.product.update.mockRejectedValue(new Error('Database error'))
 
       const testData = {
         name: 'Test',
@@ -319,7 +323,7 @@ describe('Product Update API Route - 3MF Color Data Persistence', () => {
         features: ['Multi-color printing', '3MF compatible']
       }
 
-      mockPrismaUpdate.mockResolvedValue({
+      mockPrisma.product.update.mockResolvedValue({
         id: 'test-id',
         ...updateAfter3MFUpload
       })
@@ -329,7 +333,7 @@ describe('Product Update API Route - 3MF Color Data Persistence', () => {
       const responseData = await response.json()
 
       // Verify all 3MF-related data is persisted
-      expect(mockPrismaUpdate).toHaveBeenCalledWith(
+      expect(mockPrisma.product.update).toHaveBeenCalledWith(
         expect.objectContaining({
           data: expect.objectContaining({
             numberOfColors: 2,
@@ -360,12 +364,12 @@ describe('Product Update API Route - 3MF Color Data Persistence', () => {
         modelOrientation: complexOrientation
       }
 
-      mockPrismaUpdate.mockResolvedValue({ id: 'test-id' })
+      mockPrisma.product.update.mockResolvedValue({ id: 'test-id' })
 
       const request = createMockRequest(testData)
       await PUT(request, { params: mockParams })
 
-      expect(mockPrismaUpdate).toHaveBeenCalledWith(
+      expect(mockPrisma.product.update).toHaveBeenCalledWith(
         expect.objectContaining({
           data: expect.objectContaining({
             modelOrientation: complexOrientation
