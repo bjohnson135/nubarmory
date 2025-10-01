@@ -16,11 +16,11 @@ import JSZip from 'jszip'
 jest.mock('jszip')
 const MockJSZip = JSZip as jest.MockedClass<typeof JSZip>
 
-// Mock xmldom
+// Mock @xmldom/xmldom
 const mockDOMParser = {
   parseFromString: jest.fn()
 }
-jest.mock('xmldom', () => ({
+jest.mock('@xmldom/xmldom', () => ({
   DOMParser: jest.fn(() => mockDOMParser)
 }))
 
