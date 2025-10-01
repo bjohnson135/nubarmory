@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import JSZip from 'jszip'
-const { DOMParser } = require('xmldom')
+import { DOMParser } from '@xmldom/xmldom'
 
 // Fixed NodeList forEach issues with Array.from()
 
