@@ -87,7 +87,7 @@ export default function ProductDetail({ product }: ProductDetailProps) {
         const response = await fetch(`/api/materials/${materialId}/colors`)
         if (response.ok) {
           const data = await response.json()
-          const hexCodes = colorsToConvert.map(colorName => {
+          const hexCodes = colorsToConvert.map((colorName: string) => {
             const color = data.colors.find((c: any) => c.name === colorName)
             return color ? color.hexCode : '#888888'
           })
@@ -212,12 +212,12 @@ export default function ProductDetail({ product }: ProductDetailProps) {
 
                 {/* Inventory Status */}
                 <div className="mb-6 p-3 rounded-lg border border-gray-200 bg-gray-50">
-                  {product.stockQuantity && product.stockQuantity > 0 ? (
+                  {(product as any).stockQuantity && (product as any).stockQuantity > 0 ? (
                     <div className="flex items-center text-green-600">
                       <Check className="h-5 w-5 mr-2" />
                       <span className="font-medium">
-                        {product.stockQuantity <= 5
-                          ? `Only ${product.stockQuantity} left in stock`
+                        {(product as any).stockQuantity <= 5
+                          ? `Only ${(product as any).stockQuantity} left in stock`
                           : 'In Stock'
                         } - Ships within 1-2 business days
                       </span>

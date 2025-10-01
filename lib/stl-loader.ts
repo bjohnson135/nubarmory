@@ -18,7 +18,7 @@ export class STLLoader {
       } catch (error) {
         if (onError) onError(error as ErrorEvent)
       }
-    }, onProgress, onError)
+    }, onProgress, onError as any)
   }
 
   parse(data: ArrayBuffer): STLGeometry {

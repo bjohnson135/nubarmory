@@ -136,8 +136,8 @@ export class ThreeMFLoader {
       this.objects.set(id, {
         id,
         type,
-        pid,
-        pindex,
+        pid: pid || undefined,
+        pindex: pindex || undefined,
         vertices,
         triangles
       })

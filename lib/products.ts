@@ -89,8 +89,11 @@ export async function getFeaturedProducts(): Promise<Product[]> {
       await seedProducts()
       return prisma.product.findMany({
         where: { category: 'premium' },
-        take: 3
-      })
+        take: 3,
+        include: {
+          material: true
+        }
+      }) as any
     }
 
     return products.map(p => ({
@@ -98,7 +101,7 @@ export async function getFeaturedProducts(): Promise<Product[]> {
       images: p.images as string[],
       features: p.features as string[],
       category: p.category as 'standard' | 'premium' | 'custom'
-    }))
+    })) as any
   } catch (error) {
     return sampleProducts.slice(0, 3) as Product[]
   }
@@ -118,7 +121,7 @@ export async function getAllProducts(): Promise<Product[]> {
         include: {
           material: true
         }
-      })
+      }) as any
     }
 
     return products.map(p => ({
@@ -126,7 +129,7 @@ export async function getAllProducts(): Promise<Product[]> {
       images: p.images as string[],
       features: p.features as string[],
       category: p.category as 'standard' | 'premium' | 'custom'
-    }))
+    })) as any
   } catch (error) {
     return sampleProducts as Product[]
   }
@@ -148,7 +151,7 @@ export async function getProductById(id: string): Promise<Product | null> {
       images: product.images as string[],
       features: product.features as string[],
       category: product.category as 'standard' | 'premium' | 'custom'
-    }
+    } as any
   } catch (error) {
     return null
   }
@@ -162,7 +165,7 @@ async function seedProducts() {
           ...product,
           images: product.images,
           features: product.features
-        }
+        } as any
       })
     }
   } catch (error) {
