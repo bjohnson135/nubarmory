@@ -392,7 +392,7 @@ export default function ModelViewer({
     } else if (model && typeof model === 'object' && (model as any) instanceof THREE.Group) {
       // Group of meshes (3MF files)
       console.log('ModelViewer: Updating 3MF group colors, selected colors:', selectedColors)
-      let meshIndex = 0
+      let meshIndex: number = 0
       (model as any).traverse((child: any) => {
         if (child instanceof THREE.Mesh && child.material) {
           const material = child.material
