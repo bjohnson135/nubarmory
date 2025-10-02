@@ -43,7 +43,7 @@ try {
 
   // Step 2: Create/Update database schema
   console.log('\n2️⃣ Pushing database schema...');
-  execSync('npx prisma db push --skip-seed', { stdio: 'inherit' });
+  execSync('npx prisma db push', { stdio: 'inherit' });
 
   // Step 3: Create initial admin user (optional)
   console.log('\n3️⃣ Creating initial admin user...');
@@ -55,7 +55,7 @@ try {
   async function createAdminUser() {
     try {
       // Check if admin exists
-      const existingAdmin = await prisma.adminUser.findFirst({
+      const existingAdmin = await prisma.admin.findFirst({
         where: { email: 'admin@nubarmory.com' }
       });
 
@@ -66,10 +66,10 @@ try {
 
       // Create admin user
       const hashedPassword = await bcrypt.hash('ChangeThisPassword123!', 10);
-      await prisma.adminUser.create({
+      await prisma.admin.create({
         data: {
           email: 'admin@nubarmory.com',
-          password: hashedPassword,
+          passwordHash: hashedPassword,
           name: 'Admin'
         }
       });
