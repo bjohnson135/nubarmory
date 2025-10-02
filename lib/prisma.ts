@@ -12,10 +12,6 @@ function createPrismaClient() {
       db: {
         url: process.env.DATABASE_URL
       }
-    },
-    // Force transaction mode to avoid prepared statement conflicts
-    __internal: {
-      useUds: false,
     }
   })
 }
